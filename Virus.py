@@ -42,13 +42,19 @@ def main():
 
         player1.Move()
 
+        screen.fill((40, 40, 40))                       #couleur backgroud besoin d'être dans la loop?
+        pg.draw.rect(screen, (150, 200, 20), player1.drawing)
+
         if len(enemies) > 0:
             print('trying to move')
-            enemies[0].Move()
+            for x in range (0,len(enemies) - 1):
+                print(x)
+                enemies[x].Move()
+                pg.draw.rect(screen, (150, 200, 20), enemies[x].drawing)
 
 
-        screen.fill((40, 40, 40))                       #couleur backgroud besoin d'être dans la loop?
-        pg.draw.rect(screen, (150, 200, 20), player1.drawing)      #??? besoin d'être dans la loop??? c'est quoi
+
+
 
         pg.display.flip()                               #Update L'écran au complet
         clock.tick(30)                                  #1 frame au 30 millisecondes (delaie l'update de pygame)
