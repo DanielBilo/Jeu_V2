@@ -68,8 +68,15 @@ if __name__ == '__main__':
 
 class Enemy():
     def __init__(self):
+        global screen_width
+        global screen_height
         rd.seed()
         self.enemy = rd.randint(100,540)
+        self.width = 100
+        self.height = 100
+        self.x_pos = rd.randint(0, screen_width - self.width)
+        self.y_pos = 0-self.height              #crée le bloc au dessus de l'écran quand il spawn
+        self.drawing = pg.Rect(self.x_pox, self.y_pox, self.screen_width, self.height)
         #corona = pg.circle(300, 20, 20, 20)
 
     def update():
