@@ -15,6 +15,8 @@ def main():
     clock = pg.time.Clock()
     done = False
     enemies = []
+    for x in range(30):
+        enemies.append(Enemy())
 
     while not done:
         for event in pg.event.get():
@@ -27,13 +29,14 @@ def main():
         release_p = 0
         if keys[pg.K_a]:  #to move left.
             player1.direction = 2
-
         elif keys[pg.K_d]: #to move right
             player1.direction = 1
         else:
             player1.direction = 0
 
-        #print ("key_p ", keys[pg.K_p])
+
+
+        """#print ("key_p ", keys[pg.K_p])
         #print ("release ", release_p)
         if keys[pg.K_p] and release_p == 0:
             enemies.append(Enemy())
@@ -42,7 +45,7 @@ def main():
         elif keys[pg.K_p] == 0 and release_p == 1:
             release_p = 0
             print ("key_p ", keys[pg.K_p])
-            print ("release ", release_p)
+            print ("release ", release_p)"""
 
         player1.Move()
 
@@ -54,7 +57,7 @@ def main():
                 enemies[x].Move()
                 pg.draw.rect(screen, (150, 200, 20), enemies[x].drawing)
 
-
+        CheckColision(player1, enemies)
 
 
         pg.display.flip()                               #Update L'écran au complet
@@ -64,19 +67,21 @@ class Player():
     def __init__(self):
         global screen_width
         global screen_height
-        self.pos_x = screen_width/2
-        self.pox_y = screen_height/2
         self.width = 20
         self.height = 20
-        self.drawing = pg.Rect(screen_width/2, screen_height/2, self.width, self.height)
+        self.x_pos = screen_width/2
+        self.y_pos = screen_height - self.height
+        self.drawing = pg.Rect(self.x_pos, self.y_pos, self.width, self.height)
         self.direction = 0 # 0 = neutre // 1 = gauche // 2 = droite
         self.speed = 4
 
     def Move(self):
         if self.direction == 1:
             self.drawing.x += self.speed
+            self.x_pos += self.speed
         elif self.direction == 2:
             self.drawing.x -= self.speed
+            self.x_pos -= self.speed
 
 class Enemy():
     def __init__(self):
@@ -86,7 +91,7 @@ class Enemy():
         self.width = 100
         self.height = 100
         self.x_pos = rd.randint(0, screen_width - self.width)
-        self.y_pos = 0-self.height              #crée le bloc au dessus de l'écran quand il spawn
+        self.y_pos = rd.randint(-5000, 0-self.height)            #crée le bloc au dessus de l'écran quand il spawn
         self.speed = 5
         self.drawing = pg.Rect(self.x_pos, self.y_pos, self.width, self.height)
         #corona = pg.circle(300, 20, 20, 20)
@@ -95,6 +100,15 @@ class Enemy():
 #        pg.draw.circle(screen, (255, 10, 10), (enemy, 20, 20, 20))
         self.y_pos += self.speed
         self.drawing.y += self.speed
+
+def CheckColision(player, enemy):
+    for x in range (0,len(enemy)-1):
+        if  (player.x_pos < (enemy[x].x_pos + enemy[x].width) and
+            player.x_pos + player.width > enemy[x].x_pos and
+            enemy[x].y_pos + enemy[x].height > screen_height - player.height and
+            enemy[x].y_pos <= screen_height):
+            print("collision")
+            print("other")
 
 
 
