@@ -2,6 +2,7 @@ import pygame as pg
 import sys
 import random as rd
 #From Virus_python import Ennemie
+#TEST
 
 screen_width = 640   #define screen width
 screen_height = 480  #define screen height
