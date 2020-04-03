@@ -33,12 +33,16 @@ def main():
         else:
             player1.direction = 0
 
+        #print ("key_p ", keys[pg.K_p])
+        #print ("release ", release_p)
         if keys[pg.K_p] and release_p == 0:
             enemies.append(Enemy())
-            print(enemies)
             release_p = 1
-        elif not keys[pg.K_p] and release_p == 1:
+
+        elif keys[pg.K_p] == 0 and release_p == 1:
             release_p = 0
+            print ("key_p ", keys[pg.K_p])
+            print ("release ", release_p)
 
         player1.Move()
 
@@ -46,12 +50,9 @@ def main():
         pg.draw.rect(screen, (150, 200, 20), player1.drawing)
 
         if len(enemies) > 0:
-            print('trying to move')
             for x in range (0,len(enemies) - 1):
-                print(x)
                 enemies[x].Move()
                 pg.draw.rect(screen, (150, 200, 20), enemies[x].drawing)
-
 
 
 
@@ -92,8 +93,6 @@ class Enemy():
 
     def Move(self):
 #        pg.draw.circle(screen, (255, 10, 10), (enemy, 20, 20, 20))
-        print("x:", self.x_pos)
-        print("y:", self.y_pos)
         self.y_pos += self.speed
         self.drawing.y += self.speed
 
