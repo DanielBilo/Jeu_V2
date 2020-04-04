@@ -6,6 +6,9 @@ import random as rd
 
 screen_width = 640   #define screen width
 screen_height = 480  #define screen height
+game_speed = 30 #game speed must be changed to make AI learn faster (30 is normal, 100 is faster)
+
+img_virus = pg.image.load('virus_1.png')
 
 def main():
 
@@ -34,19 +37,6 @@ def main():
         else:
             player1.direction = 0
 
-
-
-        """#print ("key_p ", keys[pg.K_p])
-        #print ("release ", release_p)
-        if keys[pg.K_p] and release_p == 0:
-            enemies.append(Enemy())
-            release_p = 1
-
-        elif keys[pg.K_p] == 0 and release_p == 1:
-            release_p = 0
-            print ("key_p ", keys[pg.K_p])
-            print ("release ", release_p)"""
-
         player1.Move()
 
         screen.fill((40, 40, 40))                       #couleur backgroud besoin d'être dans la loop?
@@ -55,13 +45,11 @@ def main():
         if len(enemies) > 0:
             for x in range (0,len(enemies) - 1):
                 enemies[x].Move()
-                pg.draw.rect(screen, (150, 200, 20), enemies[x].drawing)
+                screen.blit(img_virus, enemies[x].drawing)
 
         CheckColision(player1, enemies)
-
-
         pg.display.flip()                               #Update L'écran au complet
-        clock.tick(30)                                  #1 frame au 30 millisecondes (delaie l'update de pygame)
+        clock.tick(game_speed)                                  #1 frame au 30 millisecondes (delaie l'update de pygame)
 
 class Player():
     def __init__(self):
@@ -98,8 +86,13 @@ class Enemy():
 
     def Move(self):
 #        pg.draw.circle(screen, (255, 10, 10), (enemy, 20, 20, 20))
-        self.y_pos += self.speed
-        self.drawing.y += self.speed
+        if self.y_pos > screen_height:
+            rd.seed()
+            self.y_pos = rd.randint(-5000, 0-self.height)
+            self.drawing.y = self.y_pos
+        else:
+            self.y_pos += self.speed
+            self.drawing.y += self.speed
 
 def CheckColision(player, enemy):
     for x in range (0,len(enemy)-1):
@@ -107,9 +100,10 @@ def CheckColision(player, enemy):
             player.x_pos + player.width > enemy[x].x_pos and
             enemy[x].y_pos + enemy[x].height > screen_height - player.height and
             enemy[x].y_pos <= screen_height):
-            print("collision")
-            print("other")
-
+            return True
+        else:
+            return False
+            #print("collision")
 
 
 if __name__ == '__main__':
