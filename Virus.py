@@ -43,6 +43,7 @@ def main():
             player1.direction = 0
         if keys[pg.K_p]:
             exit()
+<<<<<<< HEAD
 
 
 
@@ -52,6 +53,18 @@ def main():
         screen.blit(img_bg, draw_bg)
 
         player1.Move()
+=======
+
+        player1.Move()
+
+        screen.fill((0, 150, 255))
+        draw_bg = pg.Rect(0, 0, screen_width, screen_height)                       #couleur backgroud besoin d'être dans la loop?
+        screen.blit(img_bg, draw_bg)
+
+        pg.draw.rect(screen, (150, 200, 20), player1.drawing)
+
+
+>>>>>>> b0e898d24ddca13e868d6b9bd4b335a1a6e0e903
         if len(enemies) > 0:
             for x in range (0,len(enemies) - 1):
                 enemies[x].Move()
@@ -69,7 +82,7 @@ class Player():
         self.width = 20
         self.height = 20
         self.x_pos = screen_width/2
-        self.y_pos = screen_height - self.height
+        self.y_pos = screen_height - self.height - 40
         self.drawing = pg.Rect(self.x_pos, self.y_pos, self.width, self.height)
         self.direction = 0                                      # 0 = neutre // 1 = gauche // 2 = droite
         self.speed = 4
