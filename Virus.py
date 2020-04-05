@@ -45,6 +45,7 @@ def main():
             player1.direction = 0
         if keys[pg.K_p]:
             exit()
+            quit()
 
         player1.Move()
 
@@ -63,6 +64,8 @@ def main():
         if CheckColision(player1, enemies):
             pg.quit()
             sys.exit()
+            quit()
+
 
         pg.display.flip()                                       #Update L'écran au complet
         clock.tick(game_speed)                                  #1 frame au 30 millisecondes (delaie l'update de pygame)
