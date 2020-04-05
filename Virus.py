@@ -13,6 +13,7 @@ screen = pg.display.set_mode((screen_width, screen_height))
 clock = pg.time.Clock()
 start = 0
 done = False
+nPlayers = ''
 
 
 
@@ -187,6 +188,8 @@ def Check_Vision(player, enemy):
 
 
 def MainMenu():
+    global nPlayers
+
 
     screen.fill((0, 150, 255))
     largeTextFont = pg.font.Font('freesansbold.ttf',90)
@@ -213,8 +216,10 @@ def MainMenu():
                         nPlayers = nPlayers[:-1]
                     else:
                         nPlayers += event.unicode
-                        print(nPlayers)
-        print(nPlayers)
+
+    textSurfb2, textRectb2 = TextObj(nPlayers, smallTextFont)
+    textRectb2.center = (500, 325)
+    screen.blit(textSurfb2, textRectb2)
 
 
     pg.display.update()
