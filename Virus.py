@@ -1,39 +1,65 @@
 import pygame as pg
 import sys
 import random as rd
-#From Virus_python import Ennemie
 #TEST
 
 screen_width = 640   #define screen width
 screen_height = 480  #define screen height
 game_speed = 30 #game speed must be changed to make AI learn faster (30 is normal, 100 is faster)
+count_to_new_virus = 0
+virus_rate = 100
+screen = pg.display.set_mode((screen_width, screen_height))
+clock = pg.time.Clock()
+start = 0
+
+
 
 img_virus = pg.image.load('virus_1.png')
 img_bg = pg.image.load('background.png')
+
+def TextObj(text, font):
+    textSurface = font.render(text, True, (0,0,0))
+    return textSurface, textSurface.get_rect()
+
+def button(msg,x,y,w,h,idlecolor,activecolor):
+    mouse = pg.mouse.get_pos()
+    click = pg.mouse.get_pressed()
+    if x+w > mouse[0] > x and y+h > mouse[1] > y:
+        pg.draw.rect(screen, activecolor,(x,y,w,h))
+
+        if click[0] == 1:
+            return True
+    else:
+        pg.draw.rect(screen, idlecolor,(x,y,w,h))
+
+
+    smallText = pg.font.SysFont("cominnercolorsansms",20)
+    textSurf, textRect = TextObj(msg, smallText)
+    textRect.center = ( (x+(w/2)), (y+(h/2)) )
+    screen.blit(textSurf, textRect)
+    return False
 
 #BackGround = Background('background.png', [0,0])
 
 
 def main():
 
-    player1 = Player()
+    global count_to_new_virus
 
-    screen = pg.display.set_mode((screen_width, screen_height))
-    clock = pg.time.Clock()
+    player1 = Player()
     done = False
     enemies = []
-    for x in range(30):
-        enemies.append(Enemy())
 
-    while not done:
+
+    while not start:
+        MainMenu()
+
+    while start:
 
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 done = True
 
-        #for enn in enemies:
-        #    if player1.colliderect(enn):
-        #        done = True
         # Control de tout le clavier
         keys = pg.key.get_pressed()
         release_p = 0
@@ -55,15 +81,32 @@ def main():
 
         pg.draw.rect(screen, (150, 200, 20), player1.drawing)
 
+        player1.Move_Vision_Box()
+
+
+        for i in range(0,9):
+            pg.draw.rect(screen, (150, 200, 20), player1.line[i])
+
+
+        count_to_new_virus += 1
+
+        if(count_to_new_virus == virus_rate):
+            count_to_new_virus = 0
+            enemies.append(Enemy())
+
+
 
         if len(enemies) > 0:
-            for x in range (0,len(enemies) - 1):
+            for x in range (0,len(enemies)):
                 enemies[x].Move()
                 screen.blit(img_virus, enemies[x].drawing)
 
         if CheckColision(player1, enemies):
             pg.quit()
             sys.exit()
+
+        Check_Vision(player1, enemies)
+
 
         pg.display.flip()                                       #Update L'écran au complet
         clock.tick(game_speed)                                  #1 frame au 30 millisecondes (delaie l'update de pygame)
@@ -72,13 +115,18 @@ class Player():
     def __init__(self):
         global screen_width
         global screen_height
-        self.width = 20
-        self.height = 20
+        self.width = 30
+        self.height = 30
         self.x_pos = screen_width/2
         self.y_pos = screen_height - self.height - 40
         self.drawing = pg.Rect(self.x_pos, self.y_pos, self.width, self.height)
         self.direction = 0                                      # 0 = neutre // 1 = gauche // 2 = droite
         self.speed = 4
+
+        self.line = list()
+        for i in range(-5,4):
+            self.line.append(pg.Rect(self.x_pos - i*30 -15,200,1,screen_height-200))
+
 
     def Move(self):
         if self.direction == 1:
@@ -87,7 +135,11 @@ class Player():
         elif self.direction == -1:
             self.drawing.x -= self.speed
             self.x_pos -= self.speed
-        #self.hitbox(self.x_pos +10, self.y_pos+10, 10, 10)
+
+    def Move_Vision_Box(self):
+        for i in range(-5,4):
+            self.line[i] = pg.Rect(self.x_pos - i*30 -15,200,1,screen_height-200)
+
 
 class Enemy():
     def __init__(self):
@@ -97,30 +149,62 @@ class Enemy():
         self.width = 30
         self.height = 30
         self.x_pos = rd.randint(0, screen_width - self.width)
-        self.y_pos = rd.randint(-5000, 0-self.height)                       #crée le bloc au dessus de l'écran quand il spawn
-        self.speed = 5
+        self.y_pos = 0-self.height                       #crée le bloc au dessus de l'écran quand il spawn
+        self.speed = 1
         self.drawing = pg.Rect(self.x_pos, self.y_pos, self.width, self.height)
 
     def Move(self):
         if self.y_pos > screen_height:
-            rd.seed()
-            self.y_pos = rd.randint(-5000, 0-self.height)
-            self.drawing.y = self.y_pos
+            del self
         else:
             self.y_pos += self.speed
             self.drawing.y += self.speed
         #self.hitbox(self.x_pos +10, self.y_pos+10, 10, 10)
 
-
 def CheckColision(player, enemy):
-    for x in range (0,len(enemy)-1):
+    for x in range (0,len(enemy)):
         if  (player.x_pos < (enemy[x].x_pos + enemy[x].width) and
             player.x_pos + player.width > enemy[x].x_pos and
-            enemy[x].y_pos + enemy[x].height > screen_height - player.height and
-            enemy[x].y_pos <= screen_height):
+            enemy[x].y_pos + enemy[x].height > screen_height - player.height - 40 and
+            enemy[x].y_pos <= screen_height - 40):
             return True
     return False
-            #print("collision")
+
+def Check_Vision(player, enemy):
+    table = [0,0,0,0,0,0,0,0,0]
+    for i in range (0, len(enemy)):
+        #if True:
+        for j in range (-4,5):
+            pos = player.x_pos + j*30 + 15
+            if (pos in range(enemy[i].x_pos, enemy[i].x_pos + 30)) and (enemy[i].y_pos in range(200,screen_height)):
+                table[j+4] = 1
+            else:
+                pass
+
+    print(table)
+
+
+
+def MainMenu():
+    #global screen
+    for event in pg.event.get():
+        if event.type == pg.QUIT:
+            pg.quit()
+            quit()
+
+    screen.fill((0, 150, 255))
+    largeTextFont = pg.font.Font('freesansbold.ttf',90)
+    textSurf, textRect = TextObj("Virus Invaders", largeTextFont)
+    textRect.center = (screen_width/2, screen_height/2-100)
+    screen.blit(textSurf, textRect)
+
+    if button("Start", 150,300,100,50,(0,200,0),(0,255,0)):    #(msg,x,y,w,h,idlecolor,activecolor:
+        global start
+        start = 1
+
+    pg.display.update()
+    clock.tick(15)
+
 
 
 if __name__ == '__main__':
