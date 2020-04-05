@@ -7,27 +7,14 @@ import os
 screen_width = 640   #define screen width
 screen_height = 480  #define screen height
 game_speed = 30 #game speed must be changed to make AI learn faster (30 is normal, 100 is faster)
-<<<<<<< HEAD
-screen = pg.display.set_mode((screen_width, screen_height))
-clock = pg.time.Clock()
-=======
 count_to_new_virus = 0
 virus_rate = 100
 screen = pg.display.set_mode((screen_width, screen_height))
 clock = pg.time.Clock()
 start = 0
 done = False
->>>>>>> 675f24a84e1a545138cb013dd6681b1dca6d406d
 
 
-<<<<<<< HEAD
-def TextObj(text, font):
-    textSurface = font.render(text, True,(0,0,0))
-    return textSurface, textSurface.get_rect()
-
-#BackGround = Background('background.png', [0,0])
-=======
->>>>>>> 675f24a84e1a545138cb013dd6681b1dca6d406d
 
 img_virus = None
 img_bg = None
@@ -42,32 +29,6 @@ def button(msg,x,y,w,h,idlecolor,activecolor):
     if x+w > mouse[0] > x and y+h > mouse[1] > y:
         pg.draw.rect(screen, activecolor,(x,y,w,h))
 
-<<<<<<< HEAD
-
-    start = 0
-    done = False
-    enemies = []
-    for x in range(30):
-        enemies.append(Enemy())
-
-    while not start:
-        MainMenu()
-    while not done:
-
-        for event in pg.event.get():
-            if event.type == pg.QUIT:
-                done = True
-
-            # Control de tout le clavier
-        keys = pg.key.get_pressed()
-        release_p = 0
-        if keys[pg.K_a]:  #to move left.
-            player1.direction = -1
-        elif keys[pg.K_d]: #to move right
-            player1.direction = 1
-        else:
-            player1.direction = 0
-=======
         if click[0] == 1:
             return True
     else:
@@ -81,7 +42,6 @@ def button(msg,x,y,w,h,idlecolor,activecolor):
     return False
 
 #BackGround = Background('background.png', [0,0])
->>>>>>> 675f24a84e1a545138cb013dd6681b1dca6d406d
 
 
 def main():
@@ -93,20 +53,8 @@ def main():
     player1 = Player()
     enemies = []
 
-<<<<<<< HEAD
-        if len(enemies) > 0:
-            for x in range (0,len(enemies) - 1):
-                enemies[x].Move()
-                screen.blit(img_virus, enemies[x].drawing)
-
-        if CheckColision(player1, enemies) or player1.x_pos + player1.width > screen_width or player1.x_pos < 0:
-            pg.quit()
-            quit()
-            sys.exit()
-=======
 
     while not done:
->>>>>>> 675f24a84e1a545138cb013dd6681b1dca6d406d
 
         for event in pg.event.get():
             if event.type == pg.QUIT:
@@ -117,7 +65,7 @@ def main():
                     pg.display.quit()
                 pg.quit()
                 os._exit(os.EX_OK)
-    
+
 
         if(not done):
             MainMenu()
@@ -188,14 +136,11 @@ class Player():
         elif self.direction == -1:
             self.drawing.x -= self.speed
             self.x_pos -= self.speed
-<<<<<<< HEAD
-=======
 
     def Move_Vision_Box(self):
         for i in range(-5,4):
             self.line[i] = pg.Rect(self.x_pos - i*30 -15,50,1,screen_height-50)
 
->>>>>>> 675f24a84e1a545138cb013dd6681b1dca6d406d
 
 class Enemy():
     def __init__(self):
@@ -210,7 +155,6 @@ class Enemy():
         self.drawing = pg.Rect(self.x_pos, self.y_pos, self.width, self.height)
 
     def Move(self):
-#        pg.draw.circle(screen, (255, 10, 10), (enemy, 20, 20, 20))
         if self.y_pos > screen_height:
             del self
         else:
@@ -218,14 +162,8 @@ class Enemy():
             self.drawing.y += self.speed
         #self.hitbox(self.x_pos +10, self.y_pos+10, 10, 10)
 
-<<<<<<< HEAD
-
-def CheckColision(player, enemy): #a rajouter, considérer hauteur du player sur l'écran
-    for x in range (0,len(enemy)-1):
-=======
 def CheckColision(player, enemy):
     for x in range (0,len(enemy)):
->>>>>>> 675f24a84e1a545138cb013dd6681b1dca6d406d
         if  (player.x_pos < (enemy[x].x_pos + enemy[x].width) and
             player.x_pos + player.width > enemy[x].x_pos and
             enemy[x].y_pos + enemy[x].height > screen_height - player.height - 40 and
@@ -233,15 +171,6 @@ def CheckColision(player, enemy):
             return True
     return False
 
-<<<<<<< HEAD
-def MainMenu():
-    #global screen
-    for event in pg.event.get():
-        if event.type == pg.QUIT:
-            pg.quit()
-            quit()
-
-=======
 def Check_Vision(player, enemy):
     table = [0,0,0,0,0,0,0,0,0]
     for i in range (0, len(enemy)):
@@ -258,18 +187,12 @@ def Check_Vision(player, enemy):
 
 
 def MainMenu():
->>>>>>> 675f24a84e1a545138cb013dd6681b1dca6d406d
     screen.fill((0, 150, 255))
     largeTextFont = pg.font.Font('freesansbold.ttf',90)
     textSurf, textRect = TextObj("Virus Invaders", largeTextFont)
     textRect.center = (screen_width/2, screen_height/2-100)
     screen.blit(textSurf, textRect)
 
-<<<<<<< HEAD
-    pg.display.update()
-    clock.tick(15)
-
-=======
     if button("Start", 150,300,100,50,(0,200,0),(0,255,0)):    #(msg,x,y,w,h,idlecolor,activecolor:
         global start
         start = 1
@@ -292,7 +215,6 @@ def run(config_file):
     # Run for up to 50 generations.
     winner = p.run(eval_genomes, 50)
 
->>>>>>> 675f24a84e1a545138cb013dd6681b1dca6d406d
 
 
 #if __name__ == '__main__':
