@@ -69,7 +69,7 @@ def main():
 
         if(not done):
             MainMenu()
-        print(done)
+        #print(done)
         while start:
             #run(config_path)
             for event in pg.event.get():
@@ -90,7 +90,7 @@ def main():
 
             player1.Move()
             screen.fill((0, 150, 255))
-            draw_bg = pg.Rect(0, 0, screen_width, screen_height)                       #couleur backgroud besoin d'être dans la loop?
+            draw_bg = pg.Rect(0, 0, screen_width, screen_height)
             screen.blit(img_bg, draw_bg)
             pg.draw.rect(screen, (150, 200, 20), player1.drawing)
             player1.Move_Vision_Box()
@@ -187,15 +187,35 @@ def Check_Vision(player, enemy):
 
 
 def MainMenu():
+
     screen.fill((0, 150, 255))
     largeTextFont = pg.font.Font('freesansbold.ttf',90)
-    textSurf, textRect = TextObj("Virus Invaders", largeTextFont)
-    textRect.center = (screen_width/2, screen_height/2-100)
-    screen.blit(textSurf, textRect)
+    smallTextFont = pg.font.Font("freesansbold.ttf",20)
+
+    textSurfb1, textRectb1 = TextObj("Virus Invaders", largeTextFont)
+    textRectb1.center = (screen_width/2, screen_height/2-100)
+    screen.blit(textSurfb1, textRectb1)
 
     if button("Start", 150,300,100,50,(0,200,0),(0,255,0)):    #(msg,x,y,w,h,idlecolor,activecolor:
         global start
         start = 1
+
+    if button("nb. Players: ", 350,300,200,50, (0,0,200), (0,0,255)):
+        end = 0
+        nPlayers = ''
+        while not end:
+            for event in pg.event.get():
+                print('in for')
+                if event.type == pg.KEYDOWN:
+                    if event.key == pg.K_RETURN:
+                        end = 1
+                    elif event.key == pg.K_BACKSPACE:
+                        nPlayers = nPlayers[:-1]
+                    else:
+                        nPlayers += event.unicode
+                        print(nPlayers)
+        print(nPlayers)
+
 
     pg.display.update()
     clock.tick(15)
