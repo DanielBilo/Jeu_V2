@@ -7,9 +7,15 @@ import random as rd
 screen_width = 640   #define screen width
 screen_height = 480  #define screen height
 game_speed = 30 #game speed must be changed to make AI learn faster (30 is normal, 100 is faster)
+screen = pg.display.set_mode((screen_width, screen_height))
+clock = pg.time.Clock()
 
 img_virus = pg.image.load('virus_1.png')
 img_bg = pg.image.load('background.png')
+
+def TextObj(text, font):
+    textSurface = font.render(text, True,(0,0,0))
+    return textSurface, textSurface.get_rect()
 
 #BackGround = Background('background.png', [0,0])
 
@@ -18,23 +24,22 @@ def main():
 
     player1 = Player()
 
-    screen = pg.display.set_mode((screen_width, screen_height))
-    clock = pg.time.Clock()
+
+    start = 0
     done = False
     enemies = []
     for x in range(30):
         enemies.append(Enemy())
 
+    while not start:
+        MainMenu()
     while not done:
 
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 done = True
 
-        #for enn in enemies:
-        #    if player1.colliderect(enn):
-        #        done = True
-        # Control de tout le clavier
+            # Control de tout le clavier
         keys = pg.key.get_pressed()
         release_p = 0
         if keys[pg.K_a]:  #to move left.
@@ -58,10 +63,9 @@ def main():
                 enemies[x].Move()
                 screen.blit(img_virus, enemies[x].drawing)
 
-        if CheckColision(player1, enemies) or
-        player1.x_pos + player1.width > screen_width or
-        player1.x_pos < 0:
+        if CheckColision(player1, enemies) or player1.x_pos + player1.width > screen_width or player1.x_pos < 0:
             pg.quit()
+            quit()
             sys.exit()
 
         pg.display.flip()                                       #Update L'écran au complet
@@ -111,7 +115,7 @@ class Enemy():
         #self.hitbox(self.x_pos +10, self.y_pos+10, 10, 10)
 
 
-def CheckColision(player, enemy):
+def CheckColision(player, enemy): #a rajouter, considérer hauteur du player sur l'écran
     for x in range (0,len(enemy)-1):
         if  (player.x_pos < (enemy[x].x_pos + enemy[x].width) and
             player.x_pos + player.width > enemy[x].x_pos and
@@ -121,7 +125,21 @@ def CheckColision(player, enemy):
     return False
 
 def MainMenu():
-    pass
+    #global screen
+    for event in pg.event.get():
+        if event.type == pg.QUIT:
+            pg.quit()
+            quit()
+
+    screen.fill((0, 150, 255))
+    largeTextFont = pg.font.Font('freesansbold.ttf',90)
+    textSurf, textRect = TextObj("Virus Invaders", largeTextFont)
+    textRect.center = (screen_width/2, screen_height/2-100)
+    screen.blit(textSurf, textRect)
+
+    pg.display.update()
+    clock.tick(15)
+
 
 
 if __name__ == '__main__':
