@@ -64,8 +64,6 @@ def main():
         if CheckColision(player1, enemies):
             pg.quit()
             sys.exit()
-            quit()
-
 
         pg.display.flip()                                       #Update L'écran au complet
         clock.tick(game_speed)                                  #1 frame au 30 millisecondes (delaie l'update de pygame)
@@ -89,6 +87,7 @@ class Player():
         elif self.direction == -1:
             self.drawing.x -= self.speed
             self.x_pos -= self.speed
+        #self.hitbox(self.x_pos +10, self.y_pos+10, 10, 10)
 
 class Enemy():
     def __init__(self):
@@ -103,7 +102,6 @@ class Enemy():
         self.drawing = pg.Rect(self.x_pos, self.y_pos, self.width, self.height)
 
     def Move(self):
-#        pg.draw.circle(screen, (255, 10, 10), (enemy, 20, 20, 20))
         if self.y_pos > screen_height:
             rd.seed()
             self.y_pos = rd.randint(-5000, 0-self.height)
