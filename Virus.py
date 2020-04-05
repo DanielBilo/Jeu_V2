@@ -43,8 +43,6 @@ def main():
             player1.direction = 1
         else:
             player1.direction = 0
-        if keys[pg.K_p]:
-            exit()
 
         player1.Move()
 
@@ -60,7 +58,9 @@ def main():
                 enemies[x].Move()
                 screen.blit(img_virus, enemies[x].drawing)
 
-        if CheckColision(player1, enemies):
+        if CheckColision(player1, enemies) or
+        player1.x_pos + player1.width > screen_width or
+        player1.x_pos < 0:
             pg.quit()
             sys.exit()
 
