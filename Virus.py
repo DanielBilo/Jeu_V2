@@ -1,6 +1,7 @@
 import pygame as pg
 import sys
 import random as rd
+import os
 #TEST
 
 screen_width = 640   #define screen width
@@ -11,11 +12,12 @@ virus_rate = 100
 screen = pg.display.set_mode((screen_width, screen_height))
 clock = pg.time.Clock()
 start = 0
+done = False
 
 
 
-img_virus = pg.image.load('virus_1.png')
-img_bg = pg.image.load('background.png')
+img_virus = None
+img_bg = None
 
 def TextObj(text, font):
     textSurface = font.render(text, True, (0,0,0))
@@ -45,71 +47,70 @@ def button(msg,x,y,w,h,idlecolor,activecolor):
 def main():
 
     global count_to_new_virus
+    global start
+    global done
 
     player1 = Player()
-    done = False
     enemies = []
 
 
-    while not start:
-        MainMenu()
-
-    while start:
+    while not done:
 
         for event in pg.event.get():
             if event.type == pg.QUIT:
-                done = True
+                try:
+                    sys.exit()
+                except:
+                    print(sys.exc_info()[0])
+                    pg.display.quit()
+                pg.quit()
+                os._exit(os.EX_OK)
+    
 
-        # Control de tout le clavier
-        keys = pg.key.get_pressed()
-        release_p = 0
-        if keys[pg.K_a]:  #to move left.
-            player1.direction = -1
-        elif keys[pg.K_d]: #to move right
-            player1.direction = 1
-        else:
-            player1.direction = 0
-        if keys[pg.K_p]:
-            exit()
-            quit()
-
-        player1.Move()
-
-        screen.fill((0, 150, 255))
-        draw_bg = pg.Rect(0, 0, screen_width, screen_height)                       #couleur backgroud besoin d'être dans la loop?
-        screen.blit(img_bg, draw_bg)
-
-        pg.draw.rect(screen, (150, 200, 20), player1.drawing)
-
-        player1.Move_Vision_Box()
-
-
-        for i in range(0,9):
-            pg.draw.rect(screen, (150, 200, 20), player1.line[i])
-
-
-        count_to_new_virus += 1
-
-        if(count_to_new_virus == virus_rate):
-            count_to_new_virus = 0
-            enemies.append(Enemy())
+        if(not done):
+            MainMenu()
+        print(done)
+        while start:
+            #run(config_path)
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
+                    start = 0
+            # Control de tout le clavier
+            keys = pg.key.get_pressed()
+            release_p = 0
+            if keys[pg.K_a]:  #to move left.
+                player1.direction = -1
+            elif keys[pg.K_d]: #to move right
+                player1.direction = 1
+            else:
+                player1.direction = 0
+            if keys[pg.K_p]:
+                start = 0
 
 
-
-        if len(enemies) > 0:
-            for x in range (0,len(enemies)):
-                enemies[x].Move()
-                screen.blit(img_virus, enemies[x].drawing)
-
-        if CheckColision(player1, enemies):
-            pg.quit()
-            sys.exit()
-
-        Check_Vision(player1, enemies)
-
-
-        pg.display.flip()                                       #Update L'écran au complet
-        clock.tick(game_speed)                                  #1 frame au 30 millisecondes (delaie l'update de pygame)
+            player1.Move()
+            screen.fill((0, 150, 255))
+            draw_bg = pg.Rect(0, 0, screen_width, screen_height)                       #couleur backgroud besoin d'être dans la loop?
+            screen.blit(img_bg, draw_bg)
+            pg.draw.rect(screen, (150, 200, 20), player1.drawing)
+            player1.Move_Vision_Box()
+            for i in range(0,9):
+                pg.draw.rect(screen, (150, 200, 20), player1.line[i])
+            count_to_new_virus += 1
+            if(count_to_new_virus == virus_rate):
+                count_to_new_virus = 0
+                enemies.append(Enemy())
+            if len(enemies) > 0:
+                for x in range (0,len(enemies)):
+                    enemies[x].Move()
+                    screen.blit(img_virus, enemies[x].drawing)
+            if CheckColision(player1, enemies):
+                start = 0
+                #pg.quit()
+                #sys.exit()
+            Check_Vision(player1, enemies)
+            pg.display.flip()                                       #Update L'écran au complet
+            clock.tick(game_speed)                            #1 frame au 30 millisecondes (delaie l'update de pygame)
 
 class Player():
     def __init__(self):
@@ -138,7 +139,7 @@ class Player():
 
     def Move_Vision_Box(self):
         for i in range(-5,4):
-            self.line[i] = pg.Rect(self.x_pos - i*30 -15,200,1,screen_height-200)
+            self.line[i] = pg.Rect(self.x_pos - i*30 -15,50,1,screen_height-50)
 
 
 class Enemy():
@@ -176,22 +177,16 @@ def Check_Vision(player, enemy):
         #if True:
         for j in range (-4,5):
             pos = player.x_pos + j*30 + 15
-            if (pos in range(enemy[i].x_pos, enemy[i].x_pos + 30)) and (enemy[i].y_pos in range(200,screen_height)):
-                table[j+4] = 1
+            if (pos in range(enemy[i].x_pos, enemy[i].x_pos + 30)) and (enemy[i].y_pos in range(50,screen_height)):
+                table[j+4] = (enemy[i].y_pos)/480
             else:
                 pass
 
-    print(table)
+    return table
 
 
 
 def MainMenu():
-    #global screen
-    for event in pg.event.get():
-        if event.type == pg.QUIT:
-            pg.quit()
-            quit()
-
     screen.fill((0, 150, 255))
     largeTextFont = pg.font.Font('freesansbold.ttf',90)
     textSurf, textRect = TextObj("Virus Invaders", largeTextFont)
@@ -207,8 +202,26 @@ def MainMenu():
 
 
 
-if __name__ == '__main__':
-    pg.init()
-    main()
-    pg.quit()
-    sys.exit()
+
+def run(config_file):
+
+    config = neat.config.Config(neat.DefaultGenome, neat.DefaultReproduction,
+                         neat.DefaultSpeciesSet, neat.DefaultStagnation,
+                         config_file)
+
+    # Create the population, which is the top-level object for a NEAT run.
+    p = neat.Population(config)
+
+    # Run for up to 50 generations.
+    winner = p.run(eval_genomes, 50)
+
+
+
+#if __name__ == '__main__':
+local_dir = os.path.dirname(__file__)
+config_path = os.path.join(local_dir, 'config-feedforward.txt')
+img_virus = pg.image.load(local_dir + '/virus_1.png')
+img_bg = pg.image.load(local_dir + '/background.png')
+pg.init()
+main()
+#sys.exit()
