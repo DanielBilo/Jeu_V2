@@ -38,7 +38,7 @@ def main():
         keys = pg.key.get_pressed()
         release_p = 0
         if keys[pg.K_a]:  #to move left.
-            player1.direction = 2
+            player1.direction = -1
         elif keys[pg.K_d]: #to move right
             player1.direction = 1
         else:
@@ -58,7 +58,6 @@ def main():
         if len(enemies) > 0:
             for x in range (0,len(enemies) - 1):
                 enemies[x].Move()
-                #pg.draw.rect(screen, (150, 200, 20), enemies[x].drawing)
                 screen.blit(img_virus, enemies[x].drawing)
 
         if CheckColision(player1, enemies):
@@ -84,25 +83,24 @@ class Player():
         if self.direction == 1:
             self.drawing.x += self.speed
             self.x_pos += self.speed
-        elif self.direction == 2:
+        elif self.direction == -1:
             self.drawing.x -= self.speed
             self.x_pos -= self.speed
-        #self.hitbox(self.x_pos +10, self.y_pos+10, 10, 10)
 
 class Enemy():
     def __init__(self):
         global screen_width
         global screen_height
         rd.seed()
-        self.width = 50
-        self.height = 50
+        self.width = 30
+        self.height = 30
         self.x_pos = rd.randint(0, screen_width - self.width)
         self.y_pos = rd.randint(-5000, 0-self.height)                       #crée le bloc au dessus de l'écran quand il spawn
         self.speed = 5
         self.drawing = pg.Rect(self.x_pos, self.y_pos, self.width, self.height)
-        #corona = pg.circle(300, 20, 20, 20)
 
     def Move(self):
+#        pg.draw.circle(screen, (255, 10, 10), (enemy, 20, 20, 20))
         if self.y_pos > screen_height:
             rd.seed()
             self.y_pos = rd.randint(-5000, 0-self.height)
@@ -121,7 +119,9 @@ def CheckColision(player, enemy):
             enemy[x].y_pos <= screen_height):
             return True
     return False
-            #print("collision")
+
+def MainMenu():
+    pass
 
 
 if __name__ == '__main__':
