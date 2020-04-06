@@ -13,7 +13,7 @@ screen = pg.display.set_mode((screen_width, screen_height))
 clock = pg.time.Clock()
 start = 0
 done = False
-nPlayers = ''
+nPlayers = 1
 
 
 
@@ -51,7 +51,7 @@ def main():
     global start
     global done
 
-    player1 = Player()
+    players = []
     enemies = []
 
 
@@ -70,33 +70,46 @@ def main():
 
         if(not done):
             MainMenu()
-        #print(done)
+        #print(done
+
+        for x in range(0,int(nPlayers)):
+            players.append(Player())
+
         while start:
-            #run(config_path)
+            #run(config_path).
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     start = 0
+
             # Control de tout le clavier
             keys = pg.key.get_pressed()
             release_p = 0
-            if keys[pg.K_a]:  #to move left.
-                player1.direction = -1
-            elif keys[pg.K_d]: #to move right
-                player1.direction = 1
+            if keys[pg.K_a]:  #to move left..
+                for x in range (0, len(players)):
+                    players[x].direction = -1
+            elif keys[pg.K_d]: #to move rightB
+                for x in range (0, len(players)):
+                    players[x].direction = 1
             else:
-                player1.direction = 0
+                for x in range (0, len(players)):
+                    players[x].direction = 0
             if keys[pg.K_p]:
                 start = 0
 
+            for x in range (0, len(players)):
+                players[x].Move()
 
-            player1.Move()
             screen.fill((0, 150, 255))
             draw_bg = pg.Rect(0, 0, screen_width, screen_height)
             screen.blit(img_bg, draw_bg)
-            pg.draw.rect(screen, (150, 200, 20), player1.drawing)
-            player1.Move_Vision_Box()
-            for i in range(0,9):
-                pg.draw.rect(screen, (150, 200, 20), player1.line[i])
+
+
+            for x in range (0, len(players)):
+                players[x].Move_Vision_Box()
+                pg.draw.rect(screen, (150, 200, 20), players[x].drawing)
+            for x in range (0, len(players)):
+                for i in range(0,9):
+                    pg.draw.rect(screen, (150, 200, 20), players[x].line[i])
             count_to_new_virus += 1
             if(count_to_new_virus == virus_rate):
                 count_to_new_virus = 0
@@ -105,11 +118,17 @@ def main():
                 for x in range (0,len(enemies)):
                     enemies[x].Move()
                     screen.blit(img_virus, enemies[x].drawing)
-            if CheckColision(player1, enemies):
-                start = 0
+
+
+            for x in range (0, len(players)):
+                players[x].Move_Vision_Box()
+                Check_Vision(players[x], enemies)
+
+                if CheckColision(players[x], enemies):
+                    start = 0
                 #pg.quit()
                 #sys.exit()
-            Check_Vision(player1, enemies)
+
             pg.display.flip()                                       #Update L'écran au complet
             clock.tick(game_speed)                            #1 frame au 30 millisecondes (delaie l'update de pygame)
 
@@ -217,7 +236,7 @@ def MainMenu():
                     else:
                         nPlayers += event.unicode
 
-    textSurfb2, textRectb2 = TextObj(nPlayers, smallTextFont)
+    textSurfb2, textRectb2 = TextObj(str(nPlayers), smallTextFont)
     textRectb2.center = (500, 325)
     screen.blit(textSurfb2, textRectb2)
 
