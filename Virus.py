@@ -2,6 +2,8 @@ import pygame as pg
 import sys
 import random as rd
 import os
+from player import Player
+from enemy import Enemy
 #TEST
 
 screen_width = 640   #define screen width
@@ -73,7 +75,7 @@ def main():
         #print(done
 
         for x in range(0,int(nPlayers)):
-            players.append(Player())
+            players.append(Player(screen_width,screen_height))
 
         while start:
             #run(config_path).
@@ -105,15 +107,15 @@ def main():
 
 
             for x in range (0, len(players)):
-                players[x].Move_Vision_Box()
+            #    players[x].Move_Vision_Box()
                 pg.draw.rect(screen, (150, 200, 20), players[x].drawing)
-            for x in range (0, len(players)):
-                for i in range(0,9):
-                    pg.draw.rect(screen, (150, 200, 20), players[x].line[i])
+            #for x in range (0, len(players)):
+                #for i in range(0,9):
+                    #pg.draw.rect(screen, (150, 200, 20), players[x].line[i])
             count_to_new_virus += 1
             if(count_to_new_virus == virus_rate):
                 count_to_new_virus = 0
-                enemies.append(Enemy())
+                enemies.append(Enemy(screen_width, screen_height))
             if len(enemies) > 0:
                 for x in range (0,len(enemies)):
                     enemies[x].Move()
@@ -121,7 +123,7 @@ def main():
 
 
             for x in range (0, len(players)):
-                players[x].Move_Vision_Box()
+                #players[x].Move_Vision_Box()
                 Check_Vision(players[x], enemies)
 
                 if CheckColision(players[x], enemies):
@@ -132,55 +134,7 @@ def main():
             pg.display.flip()                                       #Update L'écran au complet
             clock.tick(game_speed)                            #1 frame au 30 millisecondes (delaie l'update de pygame)
 
-class Player():
-    def __init__(self):
-        global screen_width
-        global screen_height
-        self.width = 30
-        self.height = 30
-        self.x_pos = screen_width/2
-        self.y_pos = screen_height - self.height - 40
-        self.drawing = pg.Rect(self.x_pos, self.y_pos, self.width, self.height)
-        self.direction = 0                                      # 0 = neutre // 1 = gauche // 2 = droite
-        self.speed = 4
 
-        self.line = list()
-        for i in range(-5,4):
-            self.line.append(pg.Rect(self.x_pos - i*30 -15,200,1,screen_height-200))
-
-
-    def Move(self):
-        if self.direction == 1:
-            self.drawing.x += self.speed
-            self.x_pos += self.speed
-        elif self.direction == -1:
-            self.drawing.x -= self.speed
-            self.x_pos -= self.speed
-
-    def Move_Vision_Box(self):
-        for i in range(-5,4):
-            self.line[i] = pg.Rect(self.x_pos - i*30 -15,50,1,screen_height-50)
-
-
-class Enemy():
-    def __init__(self):
-        global screen_width
-        global screen_height
-        rd.seed()
-        self.width = 30
-        self.height = 30
-        self.x_pos = rd.randint(0, screen_width - self.width)
-        self.y_pos = 0-self.height                       #crée le bloc au dessus de l'écran quand il spawn
-        self.speed = 1
-        self.drawing = pg.Rect(self.x_pos, self.y_pos, self.width, self.height)
-
-    def Move(self):
-        if self.y_pos > screen_height:
-            del self
-        else:
-            self.y_pos += self.speed
-            self.drawing.y += self.speed
-        #self.hitbox(self.x_pos +10, self.y_pos+10, 10, 10)
 
 def CheckColision(player, enemy):
     for x in range (0,len(enemy)):
