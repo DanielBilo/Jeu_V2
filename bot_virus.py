@@ -4,46 +4,29 @@ import random as rd
 import os
 from player import Player
 from enemy import Enemy
+import neat
 #TEST
-
+pg.font.init()
 screen_width = 640   #define screen width
 screen_height = 480  #define screen height
 game_speed = 30 #game speed must be changed to make AI learn faster (30 is normal, 100 is faster)
 count_to_new_virus = 0
-virus_rate = 100
+virus_rate = 20
 screen = pg.display.set_mode((screen_width, screen_height))
 gen = 0
 img_virus = None
 img_bg = None
 
-def TextObj(text, font):
-    textSurface = font.render(text, True, (0,0,0))
-    return textSurface, textSurface.get_rect()
-
-def button(msg,x,y,w,h,idlecolor,activecolor):
-    mouse = pg.mouse.get_pos()
-    click = pg.mouse.get_pressed()
-    if x+w > mouse[0] > x and y+h > mouse[1] > y:
-        pg.draw.rect(screen, activecolor,(x,y,w,h))
-
-        if click[0] == 1:
-            return True
-    else:
-        pg.draw.rect(screen, idlecolor,(x,y,w,h))
-
-
-    smallText = pg.font.SysFont("cominnercolorsansms",20)
-    textSurf, textRect = TextObj(msg, smallText)
-    textRect.center = ( (x+(w/2)), (y+(h/2)) )
-    screen.blit(textSurf, textRect)
-    return False
 
 
 def eval_genomes(genomes, config):
-
-    global count_to_new_virus
     global screen
     global gen
+
+    gen +=1
+    print("generation :", gen)
+
+    count_to_new_virus =0
 
     players = []
     enemies = []
@@ -58,13 +41,13 @@ def eval_genomes(genomes, config):
         ge.append(genome)
 
     score = 0
+
     clock = pg.time.Clock()
 
     run = True
 
-
-
     while run and len(players) > 0:
+        clock.tick(game_speed)
 
         for event in pg.event.get():
             if event.type == pg.QUIT:
@@ -84,49 +67,65 @@ def eval_genomes(genomes, config):
 
             if output[0] > 0.5:
                 player.direction = 1
-            elif output[0] < -0.5:
-                player.direction = -1
-            else:
+            elif output[1] > 0.5:
                 player.direction = 0
-
-        screen.fill((0, 150, 255))
-        draw_bg = pg.Rect(0, 0, screen_width, screen_height)
-        screen.blit(img_bg, draw_bg)
+            elif output[2] > 0.5:
+                player.direction = -1
 
 
-        for x in range (0, len(players)):
-            pg.draw.rect(screen, (150, 200, 20), players[x].drawing)
+        #print(len(players))
 
         count_to_new_virus += 1
         if(count_to_new_virus == virus_rate):
             count_to_new_virus = 0
             enemies.append(Enemy(screen_width, screen_height))
-        if len(enemies) > 0:
-            for x in range (0,len(enemies)):
-                enemies[x].Move()
-                screen.blit(img_virus, enemies[x].drawing)
 
 
-        for x in range (0, len(players)):
+
+        for player in players:
             #players[x].Move_Vision_Box()
-            Check_Vision(players[x], enemies)
 
-            if CheckColision(players[x], enemies):
-                start = 0
+            print(x)
+            if CheckColision(player, enemies):
+                ge[players.index(player)].fitness -=1
+                nets.pop(players.index(player))
+                ge.pop(players.index(player))
+                players.pop(players.index(player))
+
             #pg.quit()
             #sys.exit()
 
-        pg.display.flip()                                       #Update L'écran au complet
-        clock.tick(game_speed)                            #1 frame au 30 millisecondes (delaie l'update de pygame)
+        screen.fill((0, 150, 255))
+        draw_bg = pg.Rect(0, 0, screen_width, screen_height)
+        screen.blit(img_bg, draw_bg)
+
+        for x in range (0, len(players)):
+            pg.draw.rect(screen, (150, 200, 20), players[x].drawing)
+
+        if len(enemies) > 0:
+            for enn in enemies:
+                enn.Move()
+                if enn.y_pos > screen_height:
+                    enemies.pop(enemies.index(enn))
+
+                screen.blit(img_virus, enn.drawing)
+
+        #pg.display.flip()
+        pg.display.update()                                  #Update L'écran au complet
+                                   #1 frame au 30 millisecondes (delaie l'update de pygame)
 
 
 
-def CheckColision(player, enemy):
-    for x in range (0,len(enemy)):
-        if  (player.x_pos < (enemy[x].x_pos + enemy[x].width) and
-            player.x_pos + player.width > enemy[x].x_pos and
-            enemy[x].y_pos + enemy[x].height > screen_height - player.height - 40 and
-            enemy[x].y_pos <= screen_height - 40):
+def CheckColision(player, enemyl):
+    for x in range (0,len(enemyl)):
+        if  (player.x_pos < (enemyl[x].x_pos + enemyl[x].width) and
+            player.x_pos + player.width > enemyl[x].x_pos and
+            enemyl[x].y_pos + enemyl[x].height > screen_height - player.height - 40 and
+            enemyl[x].y_pos <= screen_height - 40):
+            return True
+        elif player.x_pos < 0 or player.x_pos > screen_width - player.width:
+            return True
+        elif player.x_pos < 100 or player.x_pos > screen_width -100:
             return True
     return False
 
@@ -156,13 +155,14 @@ def run(config_file):
     # Run for up to 50 generations.
     winner = p.run(eval_genomes, 50)
 
+    print("end")
 
 
-#if __name__ == '__main__':
-local_dir = os.path.dirname(__file__)
-config_path = os.path.join(local_dir, 'config-feedforward.txt')
-img_virus = pg.image.load(local_dir + '/virus_1.png')
-img_bg = pg.image.load(local_dir + '/background.png')
-pg.init()
-main()
+
+if __name__ == '__main__':
+    local_dir = os.path.dirname(__file__)
+    config_path = os.path.join(local_dir, 'config-feedforward.txt')
+    img_virus = pg.image.load(local_dir + '/virus_1.png')
+    img_bg = pg.image.load(local_dir + '/background.png')
+    run(config_path)
 #sys.exit()
